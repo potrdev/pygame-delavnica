@@ -22,37 +22,57 @@ font = pygame.font.SysFont("mont.ttf", 50)
 
 # Props
 score = 0
-clicked = False
-start = time.time()
-delay = 5
+level2 = False
 
 #Circle
 circle_x = randint(1, X)
 circle_y = randint(1 ,Y)
+
+circlemove = [circle_x,circle_y]
 
 #Barve
 BLACK = (0,0,0)
 WHITE = (255, 255, 255)
 
 exit = False
+lost = False
+win = False
 
 while not exit:
-    # Check score
-    if score <= -5:
-        break
-
     # Display
     display.fill(WHITE)
+    
+    # Check score
+    if score <= -5:
+        lost = True
+        loseText = font.render(f"YOU LOST!", True, BLACK, None)
+        display.blit(loseText, (window_X // 3, window_Y // 3))
+
+
+    if score >= 25:
+        win = True
+        winText = font.render(f"YOU WIN!", True, BLACK, None)
+        display.blit(winText, (window_X // 3, window_Y // 3))
+
 
     #BG
-    bg = pygame.image.load("bg.jpg").convert_alpha()
-    display.blit(bg, (0,0))
+    if not win and not lost:
+        bg = pygame.image.load("bg.jpg").convert_alpha()
+        display.blit(bg, (0,0))
 
     # Mouse
     mousepos = pygame.mouse.get_pos()
 
     #Elements
-    circle = pygame.draw.circle(display, WHITE, (circle_x, circle_y), 25)
+    circle = pygame.draw.circle(display, WHITE, (circlemove[0], circlemove[1]), 25)
+    
+    if score == 5:
+        level2 = True
+
+    if level2:
+        circlemove[0] += 10
+    else:
+        circlemove[0] += 5
 
     #Text
     text = font.render(f"Score: {score}", True, (255, 255, 255), None)
@@ -67,19 +87,13 @@ while not exit:
         if event.type == pygame.MOUSEBUTTONDOWN:
             click = circle.collidepoint(pygame.mouse.get_pos())
             if click == 1:
-                clicked = True
-                circle_x = randint(1,X)
-                circle_y = randint(1,Y)
                 score += 1
-                display.blit(text, (10,10))
-                clicked = False
+            else:
+                score -= 1
+            circlemove[0] = randint(1,X // 2)
+            circlemove[1] = randint(1,Y // 2)
+            display.blit(text, (10,10))
+                            
 
-    if time.time() - start >= delay:
-        if clicked == False:
-            circle_x = randint(1,X)
-            circle_y = randint(1,Y)
-            score -= 1
-            display.blit(text, (10,10))                      
-
-            pygame.display.update()
-            pygame.time.Clock().tick(FPS)
+    pygame.display.update()
+    pygame.time.Clock().tick(FPS)
