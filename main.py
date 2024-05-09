@@ -23,6 +23,7 @@ font = pygame.font.SysFont("mont.ttf", 50)
 # Props
 score = 0
 level2 = False
+level3 = False
 
 #Circle
 circle_x = randint(1, X)
@@ -33,6 +34,8 @@ circlemove = [circle_x,circle_y]
 #Barve
 BLACK = (0,0,0)
 WHITE = (255, 255, 255)
+RED = (255,0,0)
+PINK = (255, 50, 150)
 
 exit = False
 lost = False
@@ -64,19 +67,39 @@ while not exit:
     mousepos = pygame.mouse.get_pos()
 
     #Elements
-    circle = pygame.draw.circle(display, WHITE, (circlemove[0], circlemove[1]), 25)
+    if not level2 and not level3:
+        circle = pygame.draw.circle(display, WHITE, (circlemove[0], circlemove[1]), 25)
+    elif not level2 and level3:
+        circle = pygame.draw.circle(display, PINK, (circlemove[0], circlemove[1]), 25)
     
     if score == 5:
         level2 = True
+
+    if score == 10:
+        level3 = True
 
     if level2:
         circlemove[0] += 10
     else:
         circlemove[0] += 5
 
+    if circle[0] >= window_X:
+        circlemove[0] = randint(1,X // 3)
+        circlemove[1] = randint(1,Y // 3)
+        display.blit(text, (10,10))
+        score -= 1
+
+
     #Text
     text = font.render(f"Score: {score}", True, (255, 255, 255), None)
     display.blit(text, (10,10))
+
+    if not level2:
+        levelText = font.render(f"Level: 1", True, (255, 255, 255), None)
+        display.blit(levelText, (10,50))
+    else:
+        levelText = font.render(f"Level: 2", True, (255, 255, 255), None)
+        display.blit(levelText, (10,50))
 
     #Input
     keys = pygame.key.get_pressed()
