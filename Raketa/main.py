@@ -41,9 +41,16 @@ BLACK = (0,0,0)
 
 #Bullet
 bulletPos = [0,0]
-bulletSpeed = 0.3
 
 game = True
+bulletOnScreen = False
+
+class Bullet:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+bullets = []
 
 while game:
     display.fill(BLACK)
@@ -60,25 +67,32 @@ while game:
             game = False
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_SPACE:
-                bulletPos[0] = mouse[0]
-                bulletPos[1] = windowY - 60
+                newBullet = Bullet(playerPos[0], playerPos[1])
+                bullets.append(newBullet)
 
-    
-    bulletPos[1] -= bulletSpeed
-    pg.draw.circle(display, WHITE, (bulletPos[0], bulletPos[1]), 20)
-
+    for bullet in bullets:
+        bullet.y -= 0.5
+        pg.draw.circle(display, WHITE, (bullet.x, bullet.y), 10)
+        if enemy1Pos[0] >=bullet.x - 50 and enemy1Pos[0] <= bullet.x + 50 and enemy1Pos[1] >= bullet.y - 50 and enemy1Pos[1] <= bullet.y + 50:
+            bullets.pop(bullets.index(bullet))
+            enemy1Pos = [random.randint(10, windowX - 30), 0]
+            score += 1
+        if enemy2Pos[0] >=bullet.x - 50 and enemy2Pos[0] <= bullet.x + 50 and enemy2Pos[1] >= bullet.y - 50 and enemy2Pos[1] <= bullet.y + 50:
+            bullets.pop(bullets.index(bullet))
+            enemy2Pos = [random.randint(10, windowX - 30), 0]
+            score += 1
 
     playerPos = [mouse[0], windowY - 60]
 
     #Check for collision
-    if enemy1Pos[0] >= playerPos[0] - 20 and enemy1Pos[0] <= playerPos[0] + 20 and enemy1Pos[1] >= playerPos[1] - 20 and enemy1Pos[1] <= playerPos[1] + 20:
+    if enemy1Pos[0] >= playerPos[0] - 20 and enemy1Pos[0] <= playerPos[0] + 20 and enemy1Pos[1] >= playerPos[1] - 20 and enemy1Pos[1] <= playerPos[1] + 20 or enemy1Pos[1] >= windowY:
         diedText = font.render(f"You died!", True, (255, 255, 255), None)
         display.blit(diedText, (windowX // 2 - 80, windowY // 2 - 30))
         pg.display.update()
         time.sleep(2)
         game = False
     
-    if enemy2Pos[0] >= playerPos[0] - 20 and enemy2Pos[0] <= playerPos[0] + 20 and enemy2Pos[1] >= playerPos[1] - 20 and enemy2Pos[1] <= playerPos[1] + 20:
+    if enemy2Pos[0] >= playerPos[0] - 20 and enemy2Pos[0] <= playerPos[0] + 20 and enemy2Pos[1] >= playerPos[1] - 20 and enemy2Pos[1] <= playerPos[1] + 20 or enemy2Pos[1] >= windowY:
         diedText = font.render(f"You died!", True, (255, 255, 255), None)
         display.blit(diedText, (windowX // 2 - 80, windowY // 2 - 30))
         pg.display.update()
@@ -93,13 +107,13 @@ while game:
         enemy1Pos = [random.randint(10, windowX - 30), 0]
         score += 1
     else:
-        enemy1Pos[1] += 0.2
+        enemy1Pos[1] += 0.1
 
     if enemy2Pos[1] >= windowY + 20:
         enemy2Pos = [random.randint(10, windowX - 30), 0]
         score += 1
     else:
-        enemy2Pos[1] += 0.1
+        enemy2Pos[1] += 0.06
         
 
     display.blit(enemy1, (enemy1Pos[0], enemy1Pos[1]))
